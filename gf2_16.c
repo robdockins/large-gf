@@ -26,7 +26,7 @@ inline uint16_t nextPower( uint16_t b ) {
 //    (x == 0) ? 0xFFFF : 0x0000
 inline uint16_t zeroMask( uint16_t x ) {
   uint32_t y = (uint32_t) x;
-  uint32_t z = (((y - 1) >> 31) ^ 1) - 1;
+  uint32_t z = (y - 1) >> 16;
   return (uint16_t) z;
 }
 

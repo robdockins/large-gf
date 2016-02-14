@@ -40,7 +40,7 @@ zeroMask x = drop`{8} z
    y = zero # x
 
    z : [16]
-   z = (((y - 1) >> 15) ^ 1) - 1
+   z = (y - 1) >> 8
   
 property zeroMask_correct x =
   zeroMask x == (if x == 0 then 0xFF else 0x00)
