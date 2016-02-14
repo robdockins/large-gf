@@ -28,6 +28,24 @@ findLog : [8] -> [8]
 findLog i = go 0
  where go j = if (exptable@j) == i then j else go (j+1)
 
+// logtable : [FieldSize][8]
+// logtable = (tables@(`Q:[8])).2
+//   where
+//    tables : [_]([8], GF2_8, [FieldSize][8])
+//    tables = [ (0, 1, zero:[FieldSize][8]) ]
+//             #
+//             [ (i+1, nextPow b, replaceAt t b i)
+//             | (i,b,t) <- tables
+//             ]
+
+// replaceAt : {a,b,c} (fin c) => [a]b -> [c] -> b -> [a]b
+// replaceAt xs i b =
+//   [ if i == j then b else x
+//   | x <- xs
+//   | j <- [0 ...]
+//   ]
+
+
 property logexp_correct (x:[8]) =
   x == 0 || exptable@(logtable@x) == x
 property logexp_correct2 (x:[8]) =
