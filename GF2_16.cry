@@ -1,0 +1,84 @@
+
+type GF2_16 = [16]
+
+type FieldWidth = 16
+type FieldSize  = 2^^FieldWidth
+type Q = FieldSize - 1
+
+irr : [FieldWidth+1]
+irr = <| x^^16 + x^^12 + x^^3 + x + 1 |>
+
+
+nextPow : GF2_16 -> GF2_16
+nextPow b =
+  if b@0 then
+    reduced
+  else
+    b << 1
+ where reduced = tail ((b # zero) ^ irr)
+
+exptable : [2*FieldSize]GF2_16
+exptable = take tab
+ where tab = [1] # [ nextPow b | b <- tab ]
+
+logtable : [FieldSize][16]
+logtable =
+  [ 0 ] # [ findLog i | i <- [ 1 .. Q ] ]
+
+findLog : [16] -> [16]
+findLog i = go 0 1
+ where go j b = if b == i then j else go (j+1) (nextPow b)
+
+property logexp_correct (x:[16]) =
+  x == 0 || exptable@(logtable@x) == x
+property logexp_correct2 (x:[16]) =
+  x == 0 || exptable@((zero # logtable@x) + `Q:[32]) == x
+
+zeroMask : [16] -> [16]
+zeroMask x = drop`{16} z
+ where
+   y : [32]
+   y = zero # x
+
+   z : [32]
+   z = (((y - 1) >> 31) ^ 1) - 1
+  
+property zeroMask_correct x =
+  zeroMask x == (if x == 0 then 0xFFFF else 0x0000)
+
+gf2_16_mult : GF2_16 -> GF2_16 -> GF2_16
+gf2_16_mult x y = (z && d) ^ d
+
+  where a = zero # logtable@x
+        b = zero # logtable@y
+
+        c : [32]
+        c = a + b
+
+        d : [16]
+        d = exptable@c
+
+        z : [16]
+        z = zeroMask x || zeroMask y
+
+// Precondition: y is not 0
+gf2_16_div : GF2_16 -> GF2_16 -> GF2_16
+gf2_16_div x y = (z && d) ^ d
+  where a = zero # logtable@x
+        b = zero # logtable@y
+        c : [32]
+        c = a + `Q - b
+
+        d : [16]
+        d = exptable@c
+
+        z : [16]
+        z = zeroMask x
+
+property mult_correct (x:GF2_16) (y:GF2_16) =
+  gf2_16_mult x y == pmod (pmult x y) irr
+
+property div_correct (x:GF_16) (y:GF2_16) =
+  y == 0 || pmod (pmult q y) irr == x
+    where q = gf2_16_div x y
+
