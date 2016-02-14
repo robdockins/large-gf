@@ -87,22 +87,23 @@ uint16_t gf2_16_log( uint16_t x ) {
 }
 
 int main() {
-  printf("main start\n");
-  
-  for( int i=0; i<20; i++ ) {
-    printf( "EXP[%d] = 0x%.4x\n", i, gf2_16_exp_table[i] );
+  for( int i = 0; i < FIELD_SIZE; i+=16 ) {
+    printf( "  , 0x%.4x , 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x, 0x%.4x\n",
+            gf2_16_log_table[i+0],
+            gf2_16_log_table[i+1],
+            gf2_16_log_table[i+2],
+            gf2_16_log_table[i+3],
+            gf2_16_log_table[i+4],
+            gf2_16_log_table[i+5],
+            gf2_16_log_table[i+6],
+            gf2_16_log_table[i+7],
+            gf2_16_log_table[i+8],
+            gf2_16_log_table[i+9],
+            gf2_16_log_table[i+10],
+            gf2_16_log_table[i+11],
+            gf2_16_log_table[i+12],
+            gf2_16_log_table[i+13],
+            gf2_16_log_table[i+14],
+            gf2_16_log_table[i+15] );
   }
-  for( int i=0; i<20; i++ ) {
-    printf( "LOG[%d] = 0x%.4x\n", i, gf2_16_log_table[i] );
-  }
-
-  uint16_t x, y;
-  x = 0x1234;
-  y = 0xabcd;
-  uint16_t res = gf2_16_mult( x, y );
-
-  printf( "mult( 0x%.4x, 0x%.4x ) = 0x%.4x\n", x, y, res );
-
-  return 0;
 }
-  
