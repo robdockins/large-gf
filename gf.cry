@@ -1,0 +1,205 @@
+module GF where
+
+// Operations defining a Galois Field
+type GF x =
+  { add  : x -> x -> x   
+  , sub  : x -> x -> x
+  , neg  : x -> x
+  , mult : x -> x -> x
+  , div  : x -> x -> x
+  , inv  : x -> x
+  , frob : x -> x
+  , one  : x
+  , zero : x
+  }
+
+
+gf_bit : GF Bit
+gf_bit =
+  { add  = (^)
+  , sub  = (^)
+  , neg  = \x -> x
+  , mult = (&&)
+  , div  = \x y -> x
+  , inv  = \x -> x
+  , frob = \x -> x
+  , one  = True
+  , zero = False
+  }
+
+update : {n, a, c} (fin n, fin c, c >= width (n-1)) => [n]a -> [c] -> a -> [n]a
+update xs i a =
+  [ if i == j then a else xs@j
+  | j <- [ 0 .. n-1 ]
+  ]
+
+alter : {n, a, c} (fin n, fin c, c >= width (n-1)) => [n]a -> [c] -> (a -> a) -> [n]a
+alter xs i f =
+  [ if i == j then f (xs@j) else xs@j
+  | j <- [ 0 .. n-1 ]
+  ]
+
+updates : {n, m, a, c} (fin n, fin m, fin c, c >= width (n-1))
+       => [n]a -> [m]([c],a) -> [n]a
+updates xs us = ys!0
+ where
+   ys : [m+1][n]a
+   ys =
+    [xs]
+    #
+    [ update y i a
+    | (i,a) <- us
+    | y <- ys
+    ]
+
+alters : {n, m, a, c} (fin n, fin m, fin c, c >= width (n-1))
+      => [n]a -> [m]([c],a -> a) -> [n]a
+alters xs us = ys!0
+ where
+   ys : [m+1][n]a
+   ys =
+    [xs]
+    #
+    [ alter y i f
+    | (i, f) <- us
+    | y <- ys
+    ]
+
+gf_mult : {n, a} (Cmp a, fin n, 2 <= n, width (2*n-2) >= width (n-1))
+        => GF a
+        -> [n+1]a
+        -> [n]a
+        -> [n]a
+        -> [n]a
+gf_mult gf irr x y =
+   gf_reduce gf irr (gf_extend_mult gf x y)
+
+repeat : {a} a -> [inf]a
+repeat x = [x]#repeat x
+
+zip : {a,b,c,n} (a -> b -> c) -> [n]a -> [n]b -> [n]c
+zip f xs ys =
+  [ f x y
+  | x <- xs
+  | y <- ys
+  ]
+
+map : {a, b, n} (a -> b) -> [n]a -> [n]b
+map f xs = [ f x | x <- xs ]
+
+foldl : {a,b,n} (fin n) => (b -> a -> b) -> b -> [n]a -> b
+foldl f z xs = ys!0
+ where ys:[n+1]b
+       ys = [z] # [ f y x
+                  | x <- xs
+                  | y <- ys
+                  ]
+
+gf_quot_rem : {n, m, a, r} (fin n, fin m, 1 <= n, n+1 <= m, r == m-n-1)
+    => GF a
+    -> [m]a
+    -> [n+1]a
+    -> ([m-n]a, [n]a)
+gf_quot_rem gf a b = (q, r)
+ where
+  // strip the leading coefficent from b
+  ([leading],b') = splitAt`{1} b
+
+  // calculate the inverse of the leading coefficent
+  leading_inv = gf.inv leading
+
+  // negate the remaining coefficents
+  b'' = map gf.neg b'
+
+  // extend the polynomial with trailing zeros to make
+  // the lengths work out
+  c : [m]a
+  c = b'' # (take (repeat gf.zero))
+
+  // Perform the "synthetic division" algorithm.  This is similar to
+  // the polynomial long division algorithm, but requires fewer inversions
+  xs = [ a ] #
+       [ zip gf.add x ((map (gf.mult (gf.mult leading_inv (x@i))) c) >> (i+1))
+       | i <- [0 .. r]:[_][width r+1]
+       | x <- xs
+       ]
+
+  // Separate the result in to the quotient and remainder
+  (q, r) = splitAt (xs!0) 
+
+
+property gf_quot_rem_correct (x:[12]) (y:[8]) =
+  (zero#q, r) == (pdiv x y', pmod x y')
+ where
+   y' = [True]#y
+   (q,r) = gf_quot_rem gf_bit x y'
+
+property gf_quot_rem_spec (x:[12]) (y:[8]) =
+  pmult q y' ^ (zero#r) == x
+ where
+   y' = [True]#y
+   (q,r) = gf_quot_rem gf_bit x y'
+
+gf_extend_mult : {n, a} (fin n, 1 <= n, width (2*n-2) >= width (n-1))
+               => GF a
+               -> [n]a
+               -> [n]a
+               -> [2*n-1]a
+gf_extend_mult gf x y = reverse (alters zero us)
+  where
+   us = [ (i+j, gf.add (gf.mult (x!i) (y!j)) )
+        | i <- [ 0 .. n-1 ]:[_][width (2*n-2)]
+        , j <- [ 0 .. n-1 ]:[_][width (2*n-2)]
+        ]
+
+gf_reduce : {n, m, a}
+            (Cmp a, fin n, fin m, 1 <= n, n+1 <= m, m-n-1==m-n-1)
+          => GF a
+          -> [n+1]a
+          -> [m]a
+          -> [n]a
+gf_reduce gf irr x = r
+  where (q,r) = gf_quot_rem gf x irr
+
+// gf_reduce gf irr x = drop (ys!0)
+//  where
+//   ys =
+//     [ x ]
+//     #
+//     [ zip gf.sub y (map (gf.mult (coeff (y!i))) p)
+//     | i <- reverse [ n .. m-1 ]:[_][width (m-1)]
+//     | y <- ys
+//     | p <- irrs
+//     ]
+//   irrs =
+//     [ irr # take (repeat gf.zero) ]
+//     #
+//     [ p >> 1
+//     | p <- irrs
+//     ]
+//   coeff a =
+//     if a == gf.zero then
+//       gf.zero
+//     else
+//       gf.inv a
+
+
+gf2_8_irr : [8+1]
+gf2_8_irr = <| x^^8 + x^^4 + x^^3 + x + 1 |>
+
+property gf_mult_2_8_correct x y =
+  pmod (pmult x y) gf2_8_irr ==
+  gf_mult gf_bit gf2_8_irr x y
+
+// gf2 : {n} (fin n) => [n+1] -> GF [n]
+// gf2 irr =
+//   { gf_add  = (^)
+//   , gf_sub  = (^)
+//   , gf_neg  = \x -> x
+//   , gf_mult = \x y -> pmod (pmult x y) irr
+//   , gf_div  = 
+//   , gf_inv  = 
+//   , gf_frob = \x -> pmod (pmult x x) irr
+//   , gf_one  = 1
+//   , gf_zero = 0
+//   }
