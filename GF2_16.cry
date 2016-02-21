@@ -65,7 +65,7 @@ zeroMask x = drop`{16} z
 
    z : [32]
    z = (y - 1) >> 16
-  
+
 property zeroMask_correct x =
   zeroMask x == (if x == 0 then 0xFFFF else 0x0000)
 

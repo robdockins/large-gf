@@ -56,6 +56,7 @@ uint32_t gf2_32_mult( uint32_t a, uint32_t b ) {
   t = gf2_16_exp_table[ gf2_16_log_table[ c2 ] + vlog ];
   c0 ^= (z & t) ^ t;
 
+  // polynomial is now reduced, output the result
   uint32_t res = (((uint32_t) c1) << 16) | ((uint32_t) c0);
   return res;
 }
