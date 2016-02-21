@@ -46,7 +46,9 @@ uint32_t gf2_32_mult( uint32_t a, uint32_t b ) {
   // Now reduce by the field extension irreducible
   // polynomial x^2 + x + 8192
 
-  uint16_t vlog = gf2_16_log_table[8192];
+  //uint16_t vlog = gf2_16_log_table[8192];
+  // this magic number is equal to gf2_16_log_table[8192];
+  const uint16_t vlog = 0x000d;
   
   c1 ^= c2;
 

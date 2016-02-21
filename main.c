@@ -7,6 +7,8 @@
 const unsigned long MAX_ROUNDS = 10000000;
 
 int main() {
+  printf( "gf2_16_log(8192) = 0x%.4x\n", gf2_16_log_table[8192] );
+
   unsigned int randreg = 0xa1b2c3d4U;
     //0x12345678U;
 
