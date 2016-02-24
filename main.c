@@ -4,13 +4,17 @@
 #include "gf2_16.h"
 #include "gf2_32.h"
 
-const unsigned long MAX_ROUNDS = 10000000;
+const unsigned long MAX_ROUNDS = 1000000000;
+//const unsigned long MAX_ROUNDS = 100000000;
 
 int main() {
-  printf( "gf2_16_log(8192) = 0x%.4x\n", gf2_16_log_table[8192] );
+  //printf( "gf2_16_log(8192) = 0x%.4x\n", gf2_16_log_table[8192] );
 
-  unsigned int randreg = 0xa1b2c3d4U;
-    //0x12345678U;
+  unsigned int randreg;
+  FILE* urand = fopen("/dev/urandom", "r");
+  fread( &randreg, sizeof(randreg), 1, urand );
+  fclose(urand);
+  printf( "randreg = %#.8x\n", randreg );
 
   unsigned long i;
   for( i = 0; i < MAX_ROUNDS; i++ ) {
@@ -18,29 +22,18 @@ int main() {
     uint32_t y = (uint32_t) rand_r( &randreg );
     uint32_t z = (uint32_t) rand_r( &randreg );
 
-    uint32_t ans1 = gf2_32_mult( x, y ^ z);
-    uint32_t ans2 = gf2_32_mult( x, y ) ^ gf2_32_mult( x, z );
-
-    /*
-    printf("Test values:");
-    printf( "  x = 0x%.8x", x );
-    printf( "  y = 0x%.8x", y );
-    printf( "  z = 0x%.8x\n", z );
-    printf( "  ans1 = 0x%.8x\n", ans1 );
-    printf( "  ans2 = 0x%.8x\n", ans2 );
-*/
-
     // Distrbutivity test
-    if( ans1 == ans2 ) {
+    if( gf2_32_mult( x, y ^ z) ==
+        gf2_32_mult( x, y ) ^ gf2_32_mult( x, z ) ) {
     } else {
       printf( "Distributivity fail:\n" );
       printf( "  x = 0x%.8x\n", x );
       printf( "  y = 0x%.8x\n", y );
       printf( "  z = 0x%.8x\n", z );
     }
-  
+
     // Associativity test
-    if( gf2_32_mult( x, gf2_32_mult( y, z) ) ==
+    if( gf2_32_mult( x, gf2_32_mult( y, z ) ) ==
         gf2_32_mult( gf2_32_mult( x, y ), z ) ) {
     } else {
       printf( "Associativity fail:\n" );
@@ -55,6 +48,20 @@ int main() {
       printf( "Commutivity fail:\n" );
       printf( "  x = 0x%.8x\n", x );
       printf( "  y = 0x%.8x\n", y );
+    }
+
+    // squaring test
+    if( gf2_32_mult( x, x ) == gf2_32_square( x ) ) {
+    } else {
+      printf( "Squaring fail:\n" );
+      printf( "  x = 0x%.8x\n", x );
+    }
+
+    // inverse test
+    if( x == 0 || (gf2_32_mult( x, gf2_32_inv( x ) ) == 1) ) {
+    } else {
+      printf( "Inversion fail:\n" );
+      printf( "  x = 0x%.8x\n", x );
     }
   }
 
