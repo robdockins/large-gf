@@ -1,0 +1,31 @@
+This repository contains C implementations of the following
+finite Galois Fields:
+
+   GF(2^16)
+   GF(2^32)
+   GF(2^64)
+
+It also contains partial Cryptol specifications of these
+implementations.
+
+GF(2^16) is implemented via explicity lookup tables for the
+exponential and discrete logarithm functions.  The other
+two implementations arise as finite field extensions of
+GF(2^16).
+
+Field multiplication in GF(2^32) and GF(2^64) is
+straightforward polynomial multiplication followed
+by polynomial reduction, albeit hand-tuned to reduce
+the number of table lookups.  The calculation of
+multiplicative inverses uses the Itoh-Tsujii method,
+which can be made fairly fast; and is branching-free,
+unlike methods based on Euclidean division.
+
+All algorithms are _branch-free_ and _constant-time_,
+if we assume that access to the lookup tables are
+constant time (a large and untrue assumption, but probably
+reliable enough under nonadversarial conditions).
+
+I mostly put these implementations together for my own
+amusement and edification, but perhaps they could be
+useful for something eventually.
