@@ -6,6 +6,23 @@
 
 #include <stdio.h>
 
+// In this file we construct the Galois field GF(2^32)
+// as a finite field extension of GF(2^16).  The
+// field is constructed using the following irreducible
+// polynomial, whose coefficents should be understood
+// as the binary representation of elements of GF(2^16):
+//
+//    x^2 + x + 8192
+//
+// Because the constant term is the only coefficent not
+// equal to 0 or 1, modular reduction is fairly fast, requiring
+// only one additional multipliation in GF(2^16).
+//
+// Moreover, we get very lucky with this polynomial because
+// the Itoh-Tsujii method for calculating multiplicative inverses
+// works especially well for this polynomial.  The main task of
+// raising to the r = 2^16 power turns out to be almost trivial.
+
 
 uint32_t gf2_32_mult( uint32_t a, uint32_t b ) {
   uint16_t a0, a1, b0, b1, za0, za1, zb0, zb1;
@@ -106,7 +123,7 @@ uint32_t gf2_32_square( uint32_t a ) {
 }
 
 uint32_t gf2_32_inv( uint32_t a ) {
-  // Let q = 2^16.  let r = (q^2 - 1) / (q - 1) = s^16 + 1
+  // Let q = 2^16.  let r = (q^2 - 1) / (q - 1) = 2^16 + 1
   // This rather special number has to do with caluclating finite field norms.
   // For all x in GF((2^16)^2), x^r yields a value in GF(2^16); that is, for which
   // the high coefficent is 0.  We exploit this fact to perform fast inversions
