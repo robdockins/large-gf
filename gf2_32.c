@@ -44,23 +44,13 @@ uint32_t gf2_32_mult( uint32_t a, uint32_t b ) {
   zb1 = zeroMask( b1 );
 
   uint16_t c0, c1, c2;
-  uint16_t z, t;
 
-  t = gf2_16_exp_table[ alog0 + blog0 ];
-  z = za0 | zb0;
-  c0 = (z & t) ^ t;
+  c0  = gf2_16_expadd( za0|zb0, alog0, blog0 );
 
-  t = gf2_16_exp_table[ alog0 + blog1 ];
-  z = za0 | zb1;
-  c1 = (z & t) ^ t;
+  c1  = gf2_16_expadd( za0|zb1, alog0, blog1 );
+  c1 ^= gf2_16_expadd( za1|zb0, alog1, blog0 );
 
-  t = gf2_16_exp_table[ alog1 + blog0 ];
-  z = za1 | zb0;
-  c1 ^= (z & t) ^ t;
-
-  t = gf2_16_exp_table[ alog1 + blog1 ];
-  z = za1 | zb1;
-  c2 = (z & t) ^ t;
+  c2  = gf2_16_expadd( za1|zb1, alog1, blog1 );
 
   // Now reduce by the field extension irreducible
   // polynomial x^2 + x + 8192
@@ -70,11 +60,7 @@ uint32_t gf2_32_mult( uint32_t a, uint32_t b ) {
   const uint16_t vlog = 0x000d;
 
   c1 ^= c2;
-
-  //z = zeroMask( c2 );
-  //t = gf2_16_exp_table[ gf2_16_log_table[ c2 ] + vlog ];
-  t = gf2_16_exp_table[ alog1 + blog1 + vlog ];
-  c0 ^= (z & t) ^ t;
+  c0 ^= gf2_16_expadd3( zeroMask(c2), alog1, blog1, vlog );
 
   // polynomial is now reduced, output the result
   uint32_t res = (((uint32_t) c1) << 16) | ((uint32_t) c0);
@@ -93,13 +79,11 @@ uint32_t gf2_32_square( uint32_t a ) {
   alog1 = gf2_16_log_table[a1];
 
   // (a1(x) + a0)^2 = b2(x^2) + b0
-  z = zeroMask( a0 );
-  t = gf2_16_exp_table[ alog0 + alog0 ];
-  b0 = (z & t) ^ t;
+  b0 = gf2_16_expadd( zeroMask(a0), alog0, alog0 );
 
   z = zeroMask( a1 );
   t = gf2_16_exp_table[ alog1 + alog1 ];
-  b2 = (z & t) ^ t;
+  b2 = gf2_16_expadd( z, alog1, alog1 );
 
   // Now reduce by the field extension irreducible
   // polynomial x^2 + x + 8192
@@ -109,14 +93,7 @@ uint32_t gf2_32_square( uint32_t a ) {
   const uint16_t vlog = 0x000d;
 
   c1 = b2;
-
-  //z = zeroMask( b2 );
-  //t = gf2_16_exp_table[ gf2_16_log_table[ b2 ] + vlog ];
-  t = gf2_16_exp_table[ alog1 + alog1 + vlog ];
-
-
-  c0 = b0;
-  c0 ^= (z & t) ^ t;
+  c0 = b0 ^ gf2_16_expadd3( z, alog1, alog1, vlog );
 
   uint32_t res = (((uint32_t) c1) << 16) | ((uint32_t) c0);
   return res;
@@ -154,15 +131,23 @@ uint32_t gf2_32_inv( uint32_t a ) {
   // of t must be equal to 0.  We exploit this to do only the minimal amount
   // of calculation necessary to find the low coefficent of t.  This saves
   // several GF(2^16) multiplies and adds.
-  t0 = gf2_16_mult( s0, a0 );
+  uint16_t slog0 = gf2_16_log_table[s0];
+  uint16_t slog1 = gf2_16_log_table[s1];
+  uint16_t sz0   = zeroMask(s0);
+  uint16_t sz1   = zeroMask(s1);
+
+  uint16_t alog0 = gf2_16_log_table[a0];
+  uint16_t alog1 = gf2_16_log_table[a1];
+
+  uint16_t az0   = zeroMask(a0);
+  uint16_t az1   = zeroMask(a1);
+
+  t0 = gf2_16_expadd( sz0|az0, slog0, alog0 );
 
   // Multiply the high coefficents and perform polynomial reduction all at once...
   const uint16_t vlog = 0x000d;
-  uint32_t logsum = ((uint32_t) gf2_16_log_table[s1]) + ((uint32_t) gf2_16_log_table[a1] + vlog);
-  t1 = gf2_16_exp_table[ logsum ];
-  //t1 = gf2_16_exp_table[ ((uint32_t) gf2_16_log_table[ t1 ]) + vlog ];
-  uint16_t z = zeroMask( s1 ) | zeroMask( a1 );
-  t1 = (z & t1) ^ t1;
+  t1 = gf2_16_expadd3( sz1|az1, slog1, alog1, vlog );
+
   t0 ^= t1;
 
   // Now, we can find the inverse of t by just taking the inverse of t0 in
@@ -177,14 +162,10 @@ uint32_t gf2_32_inv( uint32_t a ) {
   // of s.  We do this by using the t0_log value we calculated just above.
   // We know t0 != 0, so we don't have to mask for that case.
 
-  z = zeroMask( s0 );
-  uint16_t b0 = gf2_16_exp_table[ ((uint32_t) gf2_16_log_table[s0]) + t0_inv_log ];
-  b0 = (b0 & z) ^ b0;
+  uint16_t b0 = gf2_16_expadd( sz0, slog0, t0_inv_log );
   //uint16_t b0 = gf2_16_mult( s0, t0_inv );
 
-  z = zeroMask( s1 );
-  uint16_t b1 = gf2_16_exp_table[ ((uint32_t) gf2_16_log_table[s1]) + t0_inv_log ];
-  b1 = (b1 & z) ^ b1;
+  uint16_t b1 = gf2_16_expadd( sz1, slog1, t0_inv_log );
   //uint16_t b1 = gf2_16_mult( s1, t0_inv );
 
   // Package the result and ship it

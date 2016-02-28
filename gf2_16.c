@@ -3,7 +3,7 @@
 #include "gf2_16.h"
 
 uint16_t gf2_16_log_table[FIELD_SIZE];
-uint16_t gf2_16_exp_table[2*FIELD_SIZE + 0x0f];
+uint16_t gf2_16_exp_table[2*FIELD_SIZE];
 
 inline uint16_t nextPower( uint16_t b ) {
   return
@@ -25,7 +25,7 @@ void __attribute__ ((constructor)) init_tables() {
     b = nextPower( b );
   }
 
-  for( ; i < (2*FIELD_SIZE + 0x0f); i++ ) {
+  for( ; i < (2*FIELD_SIZE); i++ ) {
     gf2_16_exp_table[i] = b;
     b = nextPower( b );
   }

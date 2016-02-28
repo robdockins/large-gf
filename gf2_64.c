@@ -12,7 +12,6 @@
 //    x^4 + x^2 + 2x + 1
 //
 
-
 inline uint64_t gf2_64_mult( uint64_t a, uint64_t b ) {
   uint16_t a0, a1, a2, a3;
   uint16_t za0, za1, za2, za3;
@@ -22,7 +21,6 @@ inline uint64_t gf2_64_mult( uint64_t a, uint64_t b ) {
   uint16_t zb0, zb1, zb2, zb3;
   uint32_t blog0, blog1, blog2, blog3;
 
-  uint16_t t, z;
   uint16_t c0, c1, c2, c3, c4, c5, c6;
   uint16_t d0, d1, d2, d3;
 
@@ -59,74 +57,38 @@ inline uint64_t gf2_64_mult( uint64_t a, uint64_t b ) {
   // Do the raw coefficent multiplications
   // via GF(2^16) tables
 
-  t   = gf2_16_exp_table[ alog0 + blog0 ];
-  z   = za0 | zb0;
-  c0  = (z & t) ^ t;
+  c0  = gf2_16_expadd( za0|zb0, alog0, blog0 );
 
-  t   = gf2_16_exp_table[ alog0 + blog1 ];
-  z   = za0 | zb1;
-  c1  = (z & t) ^ t;
+  c1  = gf2_16_expadd( za0|zb1, alog0, blog1 );
+  c1 ^= gf2_16_expadd( za1|zb0, alog1, blog0 );
 
-  t   = gf2_16_exp_table[ alog1 + blog0 ];
-  z   = za1 | zb0;
-  c1 ^= (z & t) ^ t;
+  c2  = gf2_16_expadd( za1|zb1, alog1, blog1 );
+  c2 ^= gf2_16_expadd( za2|zb0, alog2, blog0 );
+  c2 ^= gf2_16_expadd( za0|zb2, alog0, blog2 );
 
-  t   = gf2_16_exp_table[ alog1 + blog1 ];
-  z   = za1 | zb1;
-  c2  = (z & t) ^ t;
+  c3  = gf2_16_expadd( za1|zb2, alog1, blog2 );
+  c3 ^= gf2_16_expadd( za2|zb1, alog2, blog1 );
+  c3 ^= gf2_16_expadd( za3|zb0, alog3, blog0 );
+  c3 ^= gf2_16_expadd( za0|zb3, alog0, blog3 );
 
-  t   = gf2_16_exp_table[ alog2 + blog0 ];
-  z   = za2 | zb0;
-  c2 ^= (z & t) ^ t;
+  c4  = gf2_16_expadd( za1|zb3, alog1, blog3 );
+  c4 ^= gf2_16_expadd( za2|zb2, alog2, blog2 );
+  c4 ^= gf2_16_expadd( za3|zb1, alog3, blog1 );
 
-  t   = gf2_16_exp_table[ alog0 + blog2 ];
-  z   = za0 | zb2;
-  c2 ^= (z & t) ^ t;
+  c5  = gf2_16_expadd( za2|zb3, alog2, blog3 );
+  c5 ^= gf2_16_expadd( za3|zb2, alog3, blog2 );
 
-  t   = gf2_16_exp_table[ alog1 + blog2 ];
-  z   = za1 | zb2;
-  c3  = (z & t) ^ t;
+  c6  = gf2_16_expadd( za3|zb3, alog3, blog3 );
 
-  t   = gf2_16_exp_table[ alog2 + blog1 ];
-  z   = za2 | zb1;
-  c3 ^= (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog3 + blog0 ];
-  z   = za3 | zb0;
-  c3 ^= (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog0 + blog3 ];
-  z   = za0 | zb3;
-  c3 ^= (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog1 + blog3 ];
-  z   = za1 | zb3;
-  c4  = (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog2 + blog2 ];
-  z   = za2 | zb2;
-  c4 ^= (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog3 + blog1 ];
-  z   = za3 | zb1;
-  c4 ^= (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog2 + blog3 ];
-  z   = za2 | zb3;
-  c5  = (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog3 + blog2 ];
-  z   = za3 | zb2;
-  c5 ^= (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog3 + blog3 ];
-  z   = za3 | zb3;
-  c6  = (z & t) ^ t;
+  uint16_t log2  = gf2_16_log_table[2];
+  uint16_t c4log = gf2_16_log_table[c4];
+  uint16_t c5log = gf2_16_log_table[c5];
+  uint16_t c6log = gf2_16_log_table[c6];
 
   // Now perform the modular reduction
-  uint16_t c4x2 = gf2_16_mult( c4, 2 );
-  uint16_t c5x2 = gf2_16_mult( c5, 2 );
-  uint16_t c6x2 = gf2_16_mult( c6, 2 );
+  uint16_t c4x2 = gf2_16_expadd( zeroMask(c4), c4log, log2 );
+  uint16_t c5x2 = gf2_16_expadd( zeroMask(c5), c5log, log2 );
+  uint16_t c6x2 = gf2_16_expadd( zeroMask(c6), c6log, log2 );
 
   d3  = c3 ^ c5 ^ c6x2;
   d2  = c2 ^ c4 ^ c5x2;
@@ -189,25 +151,13 @@ inline uint16_t gf2_64_mult_low_coeff( uint64_t a, uint64_t b ) {
   // Do the raw coefficent multiplications
   // via GF(2^16) tables
 
-  t   = gf2_16_exp_table[ alog0 + blog0 ];
-  z   = za0 | zb0;
-  c0  = (z & t) ^ t;
+  c0  = gf2_16_expadd( za0|zb0, alog0, blog0 );
 
-  t   = gf2_16_exp_table[ alog1 + blog3 ];
-  z   = za1 | zb3;
-  c4  = (z & t) ^ t;
+  c4  = gf2_16_expadd( za1|zb3, alog1, blog3 );
+  c4 ^= gf2_16_expadd( za2|zb2, alog2, blog2 );
+  c4 ^= gf2_16_expadd( za3|zb1, alog3, blog1 );
 
-  t   = gf2_16_exp_table[ alog2 + blog2 ];
-  z   = za2 | zb2;
-  c4 ^= (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog3 + blog1 ];
-  z   = za3 | zb1;
-  c4 ^= (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog3 + blog3 ];
-  z   = za3 | zb3;
-  c6  = (z & t) ^ t;
+  c6  = gf2_16_expadd( za3|zb3, alog3, blog3 );
 
   d0  = c0 ^ c4 ^ c6;
 
@@ -233,22 +183,49 @@ inline uint16_t gf2_64_mult_low_coeff( uint64_t a, uint64_t b ) {
 inline uint64_t gf2_64_square16( uint64_t a ) {
   uint16_t a0, a1, a2, a3;
   uint16_t d0, d1, d2, d3;
+  uint16_t za0, za1, za2, za3;
+  uint32_t alog0, alog1, alog2, alog3;
 
   a3 = (uint16_t) (a >> 48);
   a2 = (uint16_t) (a >> 32);
   a1 = (uint16_t) (a >> 16);
   a0 = (uint16_t) a;
 
+  za0 = zeroMask( a0 );
+  za1 = zeroMask( a1 );
+  za2 = zeroMask( a2 );
+  za3 = zeroMask( a3 );
+
+  alog0 = gf2_16_log_table[a0];
+  alog1 = gf2_16_log_table[a1];
+  alog2 = gf2_16_log_table[a2];
+  alog3 = gf2_16_log_table[a3];
+
+  /* d3 = a3; */
+  /* d2 = gf2_16_expadd( za3, alog3, gf2_16_log_table[0x0fd3] ) ^ */
+  /*      gf2_16_expadd( za2, alog2, gf2_16_log_table[0x9b04] ) ^ */
+  /*      gf2_16_expadd( za1, alog1, gf2_16_log_table[0x1f3f] ); */
+  /* d1 = gf2_16_expadd( za3, alog3, gf2_16_log_table[0xc870] ) ^ */
+  /*      gf2_16_expadd( za2, alog2, gf2_16_log_table[0x393c] ) ^ */
+  /*      gf2_16_expadd( za1, alog1, gf2_16_log_table[0x9b04] ); */
+  /* d0 = gf2_16_expadd( za3, alog3, gf2_16_log_table[0x29d2] ) ^ */
+  /*      gf2_16_expadd( za2, alog2, gf2_16_log_table[0x6d0b] ) ^ */
+  /*      gf2_16_expadd( za1, alog1, gf2_16_log_table[0x36ef] ) ^ */
+  /*      a0; */
+
+  // The below magic values are the GF(2^16) logarithms of the a
+  // above magic numbers, which represent the matrix defining the
+  // linear transformation, a^(2^16).
   d3 = a3;
-  d2 = gf2_16_mult( 0x0fd3, a3 ) ^
-       gf2_16_mult( 0x9b04, a2 ) ^
-       gf2_16_mult( 0x1f3f, a1 );
-  d1 = gf2_16_mult( 0xc870, a3 ) ^
-       gf2_16_mult( 0x393c, a2 ) ^
-       gf2_16_mult( 0x9b04, a1 );
-  d0 = gf2_16_mult( 0x29d2, a3 ) ^
-       gf2_16_mult( 0x6d0b, a2 ) ^
-       gf2_16_mult( 0x36ef, a1 ) ^
+  d2 = gf2_16_expadd( za3, alog3, 0x6cd0 ) ^
+       gf2_16_expadd( za2, alog2, 0x3190 ) ^
+       gf2_16_expadd( za1, alog1, 0x6321 );
+  d1 = gf2_16_expadd( za3, alog3, 0x2514 ) ^
+       gf2_16_expadd( za2, alog2, 0xc643 ) ^
+       gf2_16_expadd( za1, alog1, 0x3190 );
+  d0 = gf2_16_expadd( za3, alog3, 0x49fd ) ^
+       gf2_16_expadd( za2, alog2, 0xd8dd ) ^
+       gf2_16_expadd( za1, alog1, 0x53f1 ) ^
        a0;
 
   uint64_t d =
@@ -288,21 +265,10 @@ inline uint64_t gf2_64_square( uint64_t a ) {
   // Do the raw coefficent multiplications
   // via GF(2^16) tables
 
-  t   = gf2_16_exp_table[ alog0 + alog0 ];
-  z   = za0;
-  c0  = (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog1 + alog1 ];
-  z   = za1;
-  c2  = (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog2 + alog2 ];
-  z   = za2;
-  c4  = (z & t) ^ t;
-
-  t   = gf2_16_exp_table[ alog3 + alog3 ];
-  z   = za3;
-  c6  = (z & t) ^ t;
+  c0  = gf2_16_expadd( za0, alog0, alog0 );
+  c2  = gf2_16_expadd( za1, alog1, alog1 );
+  c4  = gf2_16_expadd( za2, alog2, alog2 );
+  c6  = gf2_16_expadd( za3, alog3, alog3 );
 
   // Now perform the modular reduction
   uint16_t c4x2 = gf2_16_mult( c4, 2 );
@@ -326,15 +292,34 @@ inline uint64_t gf2_64_pointwise_mult( uint16_t x, uint64_t a ) {
   uint16_t a0, a1, a2, a3;
   uint16_t d0, d1, d2, d3;
 
+  uint16_t za0, za1, za2, za3;
+  uint32_t alog0, alog1, alog2, alog3;
+
+  uint32_t xlog;
+  uint16_t xz;
+
   a3 = (uint16_t) (a >> 48);
   a2 = (uint16_t) (a >> 32);
   a1 = (uint16_t) (a >> 16);
   a0 = (uint16_t) a;
 
-  d3 = gf2_16_mult( x, a3 );
-  d2 = gf2_16_mult( x, a2 );
-  d1 = gf2_16_mult( x, a1 );
-  d0 = gf2_16_mult( x, a0 );
+  za0 = zeroMask( a0 );
+  za1 = zeroMask( a1 );
+  za2 = zeroMask( a2 );
+  za3 = zeroMask( a3 );
+
+  alog0 = gf2_16_log_table[a0];
+  alog1 = gf2_16_log_table[a1];
+  alog2 = gf2_16_log_table[a2];
+  alog3 = gf2_16_log_table[a3];
+
+  xlog  = gf2_16_log_table[x];
+  xz    = zeroMask( x );
+
+  d3 = gf2_16_expadd( za3|xz, alog3, xlog );
+  d2 = gf2_16_expadd( za2|xz, alog2, xlog );
+  d1 = gf2_16_expadd( za1|xz, alog1, xlog );
+  d0 = gf2_16_expadd( za0|xz, alog0, xlog );
 
   uint64_t d =
     (((uint64_t) d3) << 48) |
@@ -359,6 +344,7 @@ uint64_t gf2_64_inv( uint64_t a ) {
   //     = a^(q^3 + q^2 + q)
   //     = a^(q(q^2 + q + 1))
   //     = a^(q(q(q+1)+1))
+  //     = (((a^q * a)^q)*a)^q
   //   t = a * s = a^r
   //   b = t^(-1) * s = a^(-1)
 
