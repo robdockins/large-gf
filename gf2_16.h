@@ -84,5 +84,33 @@ inline uint16_t gf2_16_log( uint16_t x ) {
   return gf2_16_log_table[x];
 }
 
+// We want to calculate a^x, for 0 <= x < 2^16, and a != 0.
+//
+// Let Q = 2^16-1, which is the order of the mutiplicative
+// group of GF(2^16). It is a fact of this multiplicative group
+// that a^Q = 1.  Now, let l = log(a), then
+// a^x = exp(log(a))^x = exp(l)^x = exp(l*x).
+// Moreover, because of the previous fact,
+// this is equal to exp( (l*x)%Q ).
+//
+// Finally, it is another amazing fact of modular arithmetic
+// that we can calculate (z%Q) very easily when z
+// is a 32-bit number: we can simply add the high
+// 16-bits to the low-16 bits.  This result may carry into
+// a 17-bit number.  This is fine, as our exponential table
+// is defined for twice the field size, i.e., for 17-bit indices.
+inline uint16_t gf2_16_pow( uint16_t a, uint16_t x ) {
+  uint32_t log;
+
+  // First calculate the multiplied logarithm.
+  log = (uint32_t) gf2_16_log_table[a];
+  log = log * (uint32_t) x;
+
+  // Now take the modulus by (2^16-1).  The following
+  // works by some magic of modular arithmetic.
+  log = (log >> 16) + (log & 0xFFFF);
+
+  return gf2_16_exp_table[ log ];
+}
 
 #endif
