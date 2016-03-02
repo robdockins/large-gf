@@ -68,7 +68,7 @@ uint32_t gf2_32_mult( uint32_t a, uint32_t b ) {
 }
 
 uint32_t gf2_32_square( uint32_t a ) {
-  uint16_t a0, a1, b0, b2, c1, c0, t, z;
+  uint16_t a0, a1, b0, b2, c1, c0, za1;
   uint32_t alog0, alog1;
 
   // a1(x) + a0
@@ -80,10 +80,8 @@ uint32_t gf2_32_square( uint32_t a ) {
 
   // (a1(x) + a0)^2 = b2(x^2) + b0
   b0 = gf2_16_expadd( zeroMask(a0), alog0, alog0 );
-
-  z = zeroMask( a1 );
-  t = gf2_16_exp_table[ alog1 + alog1 ];
-  b2 = gf2_16_expadd( z, alog1, alog1 );
+  za1 = zeroMask( a1 );
+  b2 = gf2_16_expadd( za1, alog1, alog1 );
 
   // Now reduce by the field extension irreducible
   // polynomial x^2 + x + 8192
@@ -93,7 +91,7 @@ uint32_t gf2_32_square( uint32_t a ) {
   const uint16_t vlog = 0x000d;
 
   c1 = b2;
-  c0 = b0 ^ gf2_16_expadd3( z, alog1, alog1, vlog );
+  c0 = b0 ^ gf2_16_expadd3( za1, alog1, alog1, vlog );
 
   uint32_t res = (((uint32_t) c1) << 16) | ((uint32_t) c0);
   return res;
