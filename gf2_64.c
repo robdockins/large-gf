@@ -12,6 +12,9 @@
 //    x^4 + x^2 + 2x + 1
 //
 
+// Note: the prime factors of (2^64 - 1) are:
+//  3 * 5 * 17 * 257 * 641 * 65537 * 6700417
+
 inline uint64_t gf2_64_mult( uint64_t a, uint64_t b ) {
   uint16_t a0, a1, a2, a3;
   uint16_t za0, za1, za2, za3;
@@ -330,6 +333,14 @@ inline uint64_t gf2_64_pointwise_mult( uint16_t x, uint64_t a ) {
   return d;
 }
 
+uint64_t gf2_64_mult_noinline( uint64_t a, uint64_t b ) {
+  return gf2_64_mult( a, b );
+}
+
+uint64_t gf2_64_square_noinline( uint64_t a ) {
+  return gf2_64_square( a );
+}
+
 uint64_t gf2_64_inv( uint64_t a ) {
   // Let q = 2^16.  Let r = (q^4 - 1)/(q - 1) = 2^48 + 2^32 + 2^16 + 1
   // This rather special number has to do with caluclating finite field norms.
@@ -368,4 +379,48 @@ uint64_t gf2_64_inv( uint64_t a ) {
   // b = t^(-1) * s = a^(-r) * a^(r-1) = a(-1)
   uint64_t b = gf2_64_pointwise_mult( t0_inv, s );
   return b;
+}
+
+uint64_t gf2_64_pow( uint64_t a, uint64_t x ) {
+  uint64_t z;
+  uint64_t t;
+  uint64_t d;
+
+  z = (x & 0x1) - 1;
+
+  d = a ^ 0x1;
+  d = (z & d) ^ d;
+  d = d ^ 0x1;
+
+  for( int i=1; i<64; i++ ) {
+    x >>= 1;
+    a = gf2_64_square(a);
+
+    // if the low bit of x is set, then z = ~0; else z = 0
+    z = (x & 0x1) - 1;
+
+    // if the low bit of x is set t = a; else t = 0x1
+    t = a ^ 0x1;
+    t = (z & t) ^ t;
+    t = t ^ 0x1;
+
+    d = gf2_64_mult( d, t );
+  }
+
+  return d;
+}
+
+uint64_t gf2_64_iso( uint64_t x )
+{
+  uint64_t t = 0x1;
+  uint64_t z = 0x0;
+
+  for( int i=0; i<64; i++ ) {
+    z ^= (x & 0x1) ? t : 0;
+    t = gf2_64_mult( t, gf2_64_generator );
+
+    x >>= 1;
+  }
+
+  return z;
 }

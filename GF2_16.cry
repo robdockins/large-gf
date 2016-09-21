@@ -36,7 +36,7 @@ property logexp_correct2 (x:GF2(16)) =
 //////////////////////////////////////////
 // The zero masking operation, which gives
 // us a branch-free way to handle the zero
-// cases for multiplicationl and division
+// cases for multiplication and division
 
 zeroMask : {n} (fin n, n >= 1) => [n] -> [n]
 zeroMask x = take`{n}( ((zero:[n]) # x) - 1 )
@@ -77,9 +77,13 @@ gf16_div x y = (z && c) ^ c
 /////////////////////////////////////////
 // Specifications of the operations
 
+// Proved correct by exaustive checking.
+// Note: This takes a long time (~5 days).
 property mult_correct (x, y : GF2(16) ) =
   gf16_mult x y == pmod (pmult x y) irr
 
+// Proved correct by exhaustive testing.
+// This takes only a few seconds.
 property inv_correct (x : GF2(16) ) =
   x != 0 ==>
     pmod (pmult x (gf16_inv x)) irr == 1
