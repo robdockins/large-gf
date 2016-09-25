@@ -49,8 +49,8 @@ inline uint16_t gf2_16_expadd3( uint16_t zmask, uint16_t a, uint16_t b, uint16_t
 
 // Compute polynomial multiplication in GF(2^16)
 inline uint16_t gf2_16_mult( uint16_t x, uint16_t y ) {
-  uint32_t a = (uint32_t) gf2_16_log_table[x];
-  uint32_t b = (uint32_t) gf2_16_log_table[y];
+  uint16_t a = gf2_16_log_table[x];
+  uint16_t b = gf2_16_log_table[y];
   uint16_t z = zeroMask(x) | zeroMask(y);
   return gf2_16_expadd( z, a, b );
 }
@@ -61,18 +61,16 @@ inline uint16_t gf2_16_mult( uint16_t x, uint16_t y ) {
 //
 // Precondition: y != 0
 inline uint16_t gf2_16_div( uint16_t x, uint16_t y ) {
-  uint32_t a = (uint32_t) gf2_16_log_table[x];
-  uint32_t b = (uint32_t) gf2_16_log_table[y];
-  uint32_t c = a + Q - b;
-  uint16_t d = gf2_16_exp_table[c];
+  uint16_t a = gf2_16_log_table[x];
+  uint16_t b = gf2_16_log_table[y];
   uint16_t z = zeroMask(x);
-  return (z & d) ^ d;
+  return gf2_16_expadd( z, a, Q - b );
 }
 
 // precondition x != 0
 inline uint16_t gf2_16_inv( uint16_t x ) {
-  uint32_t a = (uint32_t) gf2_16_log_table[x];
-  uint32_t b = Q - a;
+  uint16_t a = gf2_16_log_table[x];
+  uint16_t b = Q - a;
   return gf2_16_exp_table[b];
 }
 
@@ -89,7 +87,7 @@ inline uint16_t gf2_16_log( uint16_t x ) {
 // Let Q = 2^16-1, which is the order of the mutiplicative
 // group of GF(2^16). It is a fact of this multiplicative group
 // that a^Q = 1.  Now, let l = log(a), then
-// a^x = exp(log(a))^x = exp(l)^x = exp(l*x).
+// a^x = exp(log(a))^x = exp(l)^x = exp( l*x ).
 // Moreover, because of the previous fact,
 // this is equal to exp( (l*x)%Q ).
 //

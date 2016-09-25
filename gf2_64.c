@@ -12,14 +12,18 @@
 //    x^4 + x^2 + 2x + 1
 //
 
+// Note: the prime factors of (2^64 - 1) are:
+//  3 * 5 * 17 * 257 * 641 * 65537 * 6700417
+
+
 inline uint64_t gf2_64_mult( uint64_t a, uint64_t b ) {
   uint16_t a0, a1, a2, a3;
   uint16_t za0, za1, za2, za3;
-  uint32_t alog0, alog1, alog2, alog3;
+  uint16_t alog0, alog1, alog2, alog3;
 
   uint16_t b0, b1, b2, b3;
   uint16_t zb0, zb1, zb2, zb3;
-  uint32_t blog0, blog1, blog2, blog3;
+  uint16_t blog0, blog1, blog2, blog3;
 
   uint16_t c0, c1, c2, c3, c4, c5, c6;
   uint16_t d0, d1, d2, d3;
@@ -108,11 +112,11 @@ inline uint64_t gf2_64_mult( uint64_t a, uint64_t b ) {
 inline uint16_t gf2_64_mult_low_coeff( uint64_t a, uint64_t b ) {
   uint16_t a0, a1, a2, a3;
   uint16_t za0, za1, za2, za3;
-  uint32_t alog0, alog1, alog2, alog3;
+  uint16_t alog0, alog1, alog2, alog3;
 
   uint16_t b0, b1, b2, b3;
   uint16_t zb0, zb1, zb2, zb3;
-  uint32_t blog0, blog1, blog2, blog3;
+  uint16_t blog0, blog1, blog2, blog3;
 
   uint16_t t, z;
   uint16_t c0, c4, c6;
@@ -184,7 +188,7 @@ inline uint64_t gf2_64_square16( uint64_t a ) {
   uint16_t a0, a1, a2, a3;
   uint16_t d0, d1, d2, d3;
   uint16_t za0, za1, za2, za3;
-  uint32_t alog0, alog1, alog2, alog3;
+  uint16_t alog0, alog1, alog2, alog3;
 
   a3 = (uint16_t) (a >> 48);
   a2 = (uint16_t) (a >> 32);
@@ -241,7 +245,7 @@ inline uint64_t gf2_64_square16( uint64_t a ) {
 inline uint64_t gf2_64_square( uint64_t a ) {
   uint16_t a0, a1, a2, a3;
   uint16_t za0, za1, za2, za3;
-  uint32_t alog0, alog1, alog2, alog3;
+  uint16_t alog0, alog1, alog2, alog3;
 
   uint16_t t, z;
   uint16_t c0, c1, c2, c3, c4, c5, c6;
@@ -288,15 +292,12 @@ inline uint64_t gf2_64_square( uint64_t a ) {
   return d;
 }
 
-inline uint64_t gf2_64_pointwise_mult( uint16_t x, uint64_t a ) {
+inline uint64_t gf2_64_pointwise_mult( uint16_t xlog, uint64_t a ) {
   uint16_t a0, a1, a2, a3;
   uint16_t d0, d1, d2, d3;
 
   uint16_t za0, za1, za2, za3;
-  uint32_t alog0, alog1, alog2, alog3;
-
-  uint32_t xlog;
-  uint16_t xz;
+  uint16_t alog0, alog1, alog2, alog3;
 
   a3 = (uint16_t) (a >> 48);
   a2 = (uint16_t) (a >> 32);
@@ -313,13 +314,10 @@ inline uint64_t gf2_64_pointwise_mult( uint16_t x, uint64_t a ) {
   alog2 = gf2_16_log_table[a2];
   alog3 = gf2_16_log_table[a3];
 
-  xlog  = gf2_16_log_table[x];
-  xz    = zeroMask( x );
-
-  d3 = gf2_16_expadd( za3|xz, alog3, xlog );
-  d2 = gf2_16_expadd( za2|xz, alog2, xlog );
-  d1 = gf2_16_expadd( za1|xz, alog1, xlog );
-  d0 = gf2_16_expadd( za0|xz, alog0, xlog );
+  d3 = gf2_16_expadd( za3, alog3, xlog );
+  d2 = gf2_16_expadd( za2, alog2, xlog );
+  d1 = gf2_16_expadd( za1, alog1, xlog );
+  d0 = gf2_16_expadd( za0, alog0, xlog );
 
   uint64_t d =
     (((uint64_t) d3) << 48) |
@@ -349,12 +347,12 @@ uint64_t gf2_64_inv( uint64_t a ) {
   //   b = t^(-1) * s = a^(-1)
 
   // Compute s = a^(r-1)
-  uint64_t s;
-  s = gf2_64_square16( a );
-  s = gf2_64_mult( s, a );
-  s = gf2_64_square16( s );
-  s = gf2_64_mult( s, a );
-  s = gf2_64_square16( s );
+  uint64_t s = a;
+  for(int i=0;;i++) {
+    s = gf2_64_square16( s );
+    if(i>=2) break;
+    s = gf2_64_mult( s, a );
+  }
 
   // t = s * a = a^r
   // Because we know t in GF(2^16), we can save
@@ -363,9 +361,67 @@ uint64_t gf2_64_inv( uint64_t a ) {
   uint16_t t0 = gf2_64_mult_low_coeff( s, a );
 
   // Now invert t0
-  uint16_t t0_inv = gf2_16_inv( t0 );
+  //uint16_t t0_inv = gf2_16_inv( t0 );
+  uint16_t t0_inv_log = Q - gf2_16_log_table[ t0 ];
 
   // b = t^(-1) * s = a^(-r) * a^(r-1) = a(-1)
-  uint64_t b = gf2_64_pointwise_mult( t0_inv, s );
+  uint64_t b = gf2_64_pointwise_mult( t0_inv_log, s );
   return b;
+}
+
+uint64_t gf2_64_pow_alternate( uint64_t a, uint64_t x ) {
+  uint64_t d = 0x1;
+  uint64_t t;
+  for( int i=0; i<64; i++ ) {
+    t = (x & 0x1) ? a : 0x1;
+    d = gf2_64_mult( d, t );
+    x >>= 1;
+    a = gf2_64_square( a );
+  }
+
+  return d;
+}
+
+
+uint64_t gf2_64_pow( uint64_t a, uint64_t x ) {
+  uint64_t z;
+  uint64_t t;
+  uint64_t d;
+
+  z = (x & 0x1) - 1;
+
+  d = a ^ 0x1;
+  d = (z & d) ^ d;
+  d = d ^ 0x1;
+
+  for( int i=1; i<64; i++ ) {
+    x >>= 1;
+    a = gf2_64_square(a);
+
+    // if the low bit of x is set, then z = ~0; else z = 0
+    z = (x & 0x1) - 1;
+
+    // if the low bit of x is set t = a; else t = 0x1
+    t = a ^ 0x1;
+    t = (z & t) ^ t;
+    t = t ^ 0x1;
+
+    d = gf2_64_mult( d, t );
+  }
+
+  return d;
+}
+
+// Test if the given value is a generator
+uint64_t group_factors[7] = { 3, 5, 17, 257, 641, 65537, 6700417 };
+
+int gf2_64_generator( uint64_t a )
+{
+  for( int i=0; i<7; i++ ) {
+    uint64_t x = (~0) / group_factors[i];
+    uint64_t z = gf2_64_pow( a, x );
+    if (z == 0x1) return 0;
+  }
+
+  return 1;
 }

@@ -4,17 +4,19 @@
 #include "gf2_16.h"
 #include "gf2_64.h"
 
+//const unsigned long MAX_ROUNDS = 100000;
+const unsigned long MAX_ROUNDS = 100000000;
 //const unsigned long MAX_ROUNDS = 1000000000;
-const unsigned long MAX_ROUNDS = 10000000;
 
 int main() {
   unsigned int randreg;
   FILE* urand = fopen("/dev/urandom", "r");
   fread( &randreg, sizeof(randreg), 1, urand );
   fclose(urand);
+  //randreg = 0x1650338b;
   printf( "randreg = %#.8x\n", randreg );
 
-  unsigned long i;
+  uint64_t i;
   for( i = 0; i < MAX_ROUNDS; i++ ) {
     uint64_t x, y, z;
 
@@ -71,7 +73,30 @@ int main() {
       printf( "Inversion fail:\n" );
       printf( "  x = 0x%.16lx\n", x );
     }
+
+    // inverse test
+    if( x == 0 || gf2_64_inv( x ) != 0) {
+    } else {
+      printf( "Inversion fail:\n" );
+      printf( "  x = 0x%.16lx\n", x );
+    }
+
+    /* /\* power test *\/ */
+    /* if( gf2_64_pow_alternate( x, y ) == gf2_64_pow ( x, y ) ) { */
+    /* } else { */
+    /*   printf( "Power fail:\n" ); */
+    /*   printf( "  x = 0x%.16lx\n", x ); */
+    /*   printf( "  y = 0x%.16lx\n", y ); */
+    /* } */
+
+    /*
+    if( gf2_64_generator( x ) ) {
+      printf( "Group generator\n" );
+      printf( "   x = 0x%.16lx\n", x );
+    }
+    */
   }
+
 
   printf( "%d Tests completed\n", MAX_ROUNDS );
 }

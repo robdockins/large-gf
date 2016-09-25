@@ -4,8 +4,8 @@
 #include "gf2_16.h"
 #include "gf2_32.h"
 
-const unsigned long MAX_ROUNDS = 1000000000;
-//const unsigned long MAX_ROUNDS = 100000000;
+//const unsigned long MAX_ROUNDS = 1000000000;
+const unsigned long MAX_ROUNDS = 100000000;
 
 int main() {
   //printf( "gf2_16_log(8192) = 0x%.4x\n", gf2_16_log_table[8192] );

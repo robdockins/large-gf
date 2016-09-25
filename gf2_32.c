@@ -153,7 +153,7 @@ uint32_t gf2_32_inv( uint32_t a ) {
   // can save a few table lookups by instead just directly taking the log of t0,
   // and using that to perform the necessary divisions below.
   //uint16_t t0_inv = gf2_16_inv( t0 );
-  uint32_t t0_inv_log = Q - gf2_16_log_table[ t0 ];
+  uint16_t t0_inv_log = Q - gf2_16_log_table[ t0 ];
 
   // Now we calculate b = t^(-1) * s = a^(-r) * a^(r-1) = a^(-1).  Because the
   // high coefficent of t is 0, we simply multiply the inverse of t0 by the coefficents
