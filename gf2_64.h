@@ -13,4 +13,6 @@ uint64_t gf2_64_pow( uint64_t, uint64_t );
 uint64_t gf2_64_pow_alternate( uint64_t, uint64_t );
 int gf2_64_generator( uint64_t a );
 
+uint64_t gf2_64_iso( uint64_t );
+
 #endif

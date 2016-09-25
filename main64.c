@@ -8,6 +8,47 @@
 const unsigned long MAX_ROUNDS = 100000000;
 //const unsigned long MAX_ROUNDS = 1000000000;
 
+const uint64_t w64_prim = 0b11011L;
+
+uint64_t advance( uint64_t x ) {
+  if( x & (1L << 63) ) {
+    return (x << 1) ^ w64_prim;
+  } else {
+    return x << 1;
+  }
+}
+
+
+
+int main_asdf() {
+  uint64_t x = 0x1;
+  uint64_t y = 0x1;
+
+  for(int i=0; i<128; i++) {
+    uint64_t fx = gf2_64_iso(x);
+    if( fx == y ) {
+    } else {
+      printf( "Failed at %d\n", i );
+      printf( "  x   = 0x%.16llx\n", x );
+      printf( "  y   = 0x%.16llx\n", y );
+      printf( " f(x) = 0x%.16llx\n", fx );
+    }
+    
+    x = advance(x);
+    y = gf2_64_mult( y, gf2_64_generator );
+  }
+
+  return 0;
+}
+
+
+/*   for(uint64_t i=0;i<64; i++) { */
+/*     uint64_t x = gf2_64_pow( gf2_64_generator, i ); */
+/*     printf( "  x = 0x%.16llx\n", x ); */
+/*   } */
+/* } */
+
+#if 1
 int main() {
   unsigned int randreg;
   FILE* urand = fopen("/dev/urandom", "r");
@@ -24,14 +65,25 @@ int main() {
     x <<= 32;
     x |= (uint64_t) rand_r( &randreg );
 
-    y = (uint64_t) rand_r( &randreg );
-    y <<= 32;
-    y |= (uint64_t) rand_r( &randreg );
+    //y = (uint64_t) rand_r( &randreg );
+    //y <<= 32;
+    //y |= (uint64_t) rand_r( &randreg );
 
-    z = (uint64_t) rand_r( &randreg );
-    z <<= 32;
-    z |= (uint64_t) rand_r( &randreg );
+    //z = (uint64_t) rand_r( &randreg );
+    //z <<= 32;
+    //z |= (uint64_t) rand_r( &randreg );
 
+    z  = gf2_64_pow( x, 64 );
+    z ^= gf2_64_pow( x,  4 );
+    z ^= gf2_64_pow( x,  3 );
+    z ^= x;
+
+    if( z == 1 ) {
+      printf( "Isomorphism generator?:\n" );
+      printf( "  z = 0x%.16llx\n", z );
+    }
+
+    /*
     // Distrbutivity test
     if( gf2_64_mult( x, y ^ z ) ==
         gf2_64_mult( x, y ) ^ gf2_64_mult( x, z ) ) {
@@ -97,6 +149,7 @@ int main() {
     */
   }
 
-
-  printf( "%d Tests completed\n", MAX_ROUNDS );
+  printf( "%lld Tests completed\n", MAX_ROUNDS );
+  return 0;
 }
+#endif

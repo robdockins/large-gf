@@ -1,0 +1,30 @@
+Name: GFBridge
+Version: 0.1
+build-type: Simple
+cabal-version: >= 1.10
+
+extra-source-files:
+  gf2_16.h
+  gf2_16.c
+  gf2_64.h
+  gf2_64.c
+
+library
+  Hs-source-dirs: .
+  Exposed-modules:
+    Data.GF2_64
+    Data.GF2_64_Poly
+    Data.GF2_64_Properties
+
+  Build-tools: c2hs
+  Default-Language: Haskell2010
+  Default-Extensions:
+    ForeignFunctionInterface
+  C-sources:
+     gf2_16.c
+     gf2_64.c
+
+  Build-depends:
+    base == 4.*,
+    containers,
+    QuickCheck >= 2.9
