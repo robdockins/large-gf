@@ -20,6 +20,7 @@ uint64_t advance( uint64_t x ) {
 
 
 
+/*
 int main_asdf() {
   uint64_t x = 0x1;
   uint64_t y = 0x1;
@@ -40,6 +41,7 @@ int main_asdf() {
 
   return 0;
 }
+*/
 
 
 /*   for(uint64_t i=0;i<64; i++) { */
@@ -73,6 +75,7 @@ int main() {
     //z <<= 32;
     //z |= (uint64_t) rand_r( &randreg );
 
+    /*
     z  = gf2_64_pow( x, 64 );
     z ^= gf2_64_pow( x,  4 );
     z ^= gf2_64_pow( x,  3 );
@@ -82,6 +85,7 @@ int main() {
       printf( "Isomorphism generator?:\n" );
       printf( "  z = 0x%.16llx\n", z );
     }
+    */
 
     /*
     // Distrbutivity test
@@ -118,6 +122,7 @@ int main() {
       printf( "Squaring fail:\n" );
       printf( "  x = 0x%.16lx\n", x );
     }
+    */
 
     // inverse test
     if( x == 0 || (gf2_64_mult( x, gf2_64_inv( x ) ) == 1) ) {
@@ -126,6 +131,7 @@ int main() {
       printf( "  x = 0x%.16lx\n", x );
     }
 
+    /*
     // inverse test
     if( x == 0 || gf2_64_inv( x ) != 0) {
     } else {

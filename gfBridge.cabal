@@ -1,4 +1,4 @@
-Name: GFBridge
+Name: gfBridge
 Version: 0.1
 build-type: Simple
 cabal-version: >= 1.10
@@ -27,4 +27,4 @@ library
   Build-depends:
     base == 4.*,
     containers,
-    QuickCheck >= 2.9
+    QuickCheck >= 2.8

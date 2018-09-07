@@ -46,7 +46,6 @@ instance Show Poly where
     where
     terms = [ show c ++ "·x^" ++ show d
             | (d,c) <- IMap.assocs xs
---            , c /= 0
             ]
 
 instance Arbitrary Poly where
@@ -305,16 +304,16 @@ roots = [
   0x739eab4ab52efd0c,
   0x8c177f2c68a9bed9,
   0xaaecde6034e80ee8,
-  0xa83d64b90871d30,
+  0x0a83d64b90871d30,
   0x2ac171866b907e36,
   0xab7b7748cffe4f2e,
-  0x33d22d5be78d6cc,
+  0x033d22d5be78d6cc,
   0xdf3b5ae4c7f30608,
-  0xa832b866fdd9f81,
+  0x0a832b866fdd9f81,
   0x7d07dbabc28d0bb3,
   0xf7f37d68925a7d92,
   0x8c17f133423d8440,
-  0x33d7cc43f69205d,
+  0x033d7cc43f69205d,
   0x29418b82e2362395,
   0xf7f300af16688e99,
   0x2ac113578109217c,
@@ -335,7 +334,7 @@ roots = [
   0x8f3562b5319c14b5,
   0xab7bc7a0e45da2d1,
   0x785a3836eaca3275,
-  0xa8347e66bf5fea6,
+  0x0a8347e66bf5fea6,
   0x858a3c876fd1295c,
   0xdf3b6b9a9c81377e,
   0x858a3dbeebe7fb8f,
@@ -344,12 +343,12 @@ roots = [
   0x2ac1190632a3fcbd,
   0x5814bf17bb5164c9,
   0x785ac439cd480d13,
-  0xa83ba2b94af6911,
+  0x0a83ba2b94af6911,
   0x7d07bcaa3e140b8b,
   0x2941c23a9fb27ae6,
-  0x33dba7712f3f70b,
+  0x033dba7712f3f70b,
   0x8f35e63438ff58b0,
-  0x33de46693e207e0,
+  0x033de46693e207e0,
   0x5814b21c9846c41b]
 
 

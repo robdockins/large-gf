@@ -430,6 +430,7 @@ int gf2_64_generator( uint64_t a )
   }
 
   return 1;
+}
 
   /*
 uint64_t gf2_64_iso( uint64_t x )

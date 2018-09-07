@@ -24,13 +24,13 @@ int main() {
     x <<= 32;
     x |= (uint64_t) rand_r( &randreg );
 
-    y = (uint64_t) rand_r( &randreg );
-    y <<= 32;
-    y |= (uint64_t) rand_r( &randreg );
+    /* y = (uint64_t) rand_r( &randreg ); */
+    /* y <<= 32; */
+    /* y |= (uint64_t) rand_r( &randreg ); */
 
-    z = (uint64_t) rand_r( &randreg );
-    z <<= 32;
-    z |= (uint64_t) rand_r( &randreg );
+    /* z = (uint64_t) rand_r( &randreg ); */
+    /* z <<= 32; */
+    /* z |= (uint64_t) rand_r( &randreg ); */
 
     /* // Distrbutivity test */
     /* if( gf.multiply.w64( &gf, x, y ^ z ) == */
@@ -52,19 +52,19 @@ int main() {
     /*   printf( "  z = 0x%.16lx\n", z ); */
     /* } */
 
-    // inverse test
-    if( x == 0 || gf.inverse.w64( &gf, x ) != 0) {
-    } else {
-      printf( "Inversion fail:\n" );
-      printf( "  x = 0x%.16lx\n", x );
-    }
-
     /* // inverse test */
-    /* if( x == 0 || (gf.multiply.w64( &gf, x, gf.inverse.w64( &gf, x ) ) == 1) ) { */
+    /* if( x == 0 || gf.inverse.w64( &gf, x ) != 0) { */
     /* } else { */
     /*   printf( "Inversion fail:\n" ); */
     /*   printf( "  x = 0x%.16lx\n", x ); */
     /* } */
+
+    // inverse test
+    if( x == 0 || (gf.multiply.w64( &gf, x, gf.inverse.w64( &gf, x ) ) == 1) ) {
+    } else {
+      printf( "Inversion fail:\n" );
+      printf( "  x = 0x%.16lx\n", x );
+    }
 
   }
 
