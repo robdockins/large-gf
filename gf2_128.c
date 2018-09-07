@@ -172,11 +172,11 @@ inline uint128_t gf2_128_mult( uint128_t a, uint128_t b ) {
   uint16_t  c9x8 = gf2_16_expadd( zeroMask( c9),  c9, log8 );
   uint16_t  c8x8 = gf2_16_expadd( zeroMask( c8),  c8, log8 );
 
-  d7 = c14   ^ c7;
-  d6 = c14x8 ^ c13   ^ c12  ^ c11 ^ c6;
-  d5 = c13x8 ^ c10   ^ c5;
-  d4 = c14   ^ c12x8 ^ c12  ^ c11 ^ c9 ^ c4;
-  d3 = c13   ^ c11x8 ^ c10  ^ c8  ^ c3;
+  d7 = c14   ^ c12   ^ c7;
+  d6 = c14x8 ^ c13   ^ c11  ^ c6;
+  d5 = c13x8 ^ c12   ^ c10  ^ c5;
+  d4 = c14   ^ c12x8 ^ c11  ^ c9 ^ c4;
+  d3 = c13   ^ c11x8 ^ c10  ^ c8 ^ c3;
   d2 = c14   ^ c10x8 ^ c9   ^ c2;
   d1 = c14x8 ^ c13   ^ c9x8 ^ c8  ^ c1;
   d0 = c13x8 ^ c8x8  ^ c0;

@@ -4,7 +4,8 @@
 #include "gf2_16.h"
 #include "gf2_128.h"
 
-const unsigned long MAX_ROUNDS = 100000000;
+//const unsigned long MAX_ROUNDS = 100000000;
+const unsigned long MAX_ROUNDS = 100;
 
 int main(void) {
   unsigned int randreg;
@@ -42,14 +43,18 @@ int main(void) {
     z <<= 32;
     z |= (uint128_t) rand_r( &randreg );
 
+    uint128_t w = gf2_128_mult( x, gf2_128_mult( y, z ) );
+    uint128_t v = gf2_128_mult( gf2_128_mult( x, y ), z );
+
     // Associativity test
-    if( gf2_128_mult( x, gf2_128_mult( y, z ) ) ==
-        gf2_128_mult( gf2_128_mult( x, y ), z ) ) {
+    if( w == v ) {
     } else {
       printf( "Associativity fail:\n" );
       printf( "  x = 0x%.16lx%.16lx\n", (uint64_t) (x>>64), (uint64_t) x );
       printf( "  y = 0x%.16lx%.16lx\n", (uint64_t) (y>>64), (uint64_t) y );
       printf( "  z = 0x%.16lx%.16lx\n", (uint64_t) (z>>64), (uint64_t) z );
+      printf( "  w = 0x%.16lx%.16lx\n", (uint64_t) (w>>64), (uint64_t) w );
+      printf( "  v = 0x%.16lx%.16lx\n", (uint64_t) (v>>64), (uint64_t) v );
     }
 
   }
