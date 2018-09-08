@@ -79,7 +79,7 @@ inline uint128_t gf2_128_mult( uint128_t a, uint128_t b ) {
   zb3 = zeroMask( b3 );
   zb4 = zeroMask( b4 );
   zb5 = zeroMask( b5 );
-  zb6 = zeroMask( a6 );
+  zb6 = zeroMask( b6 );
   zb7 = zeroMask( b7 );
 
   c0  = gf2_16_expadd( za0|zb0, alog0, blog0 );
@@ -162,15 +162,15 @@ inline uint128_t gf2_128_mult( uint128_t a, uint128_t b ) {
   c14 = gf2_16_expadd( za7|zb7, alog7, blog7 );
 
   // Now, modular reduction
-  uint16_t log8  = gf2_16_log_table[8];
+  uint16_t log8  = 3; // gf2_16_log_table[8];
 
-  uint16_t c14x8 = gf2_16_expadd( zeroMask(c14), c14, log8 );
-  uint16_t c13x8 = gf2_16_expadd( zeroMask(c13), c13, log8 );
-  uint16_t c12x8 = gf2_16_expadd( zeroMask(c12), c12, log8 );
-  uint16_t c11x8 = gf2_16_expadd( zeroMask(c11), c11, log8 );
-  uint16_t c10x8 = gf2_16_expadd( zeroMask(c10), c10, log8 );
-  uint16_t  c9x8 = gf2_16_expadd( zeroMask( c9),  c9, log8 );
-  uint16_t  c8x8 = gf2_16_expadd( zeroMask( c8),  c8, log8 );
+  uint16_t c14x8 = gf2_16_expadd( zeroMask(c14), gf2_16_log_table[c14], log8 );
+  uint16_t c13x8 = gf2_16_expadd( zeroMask(c13), gf2_16_log_table[c13], log8 );
+  uint16_t c12x8 = gf2_16_expadd( zeroMask(c12), gf2_16_log_table[c12], log8 );
+  uint16_t c11x8 = gf2_16_expadd( zeroMask(c11), gf2_16_log_table[c11], log8 );
+  uint16_t c10x8 = gf2_16_expadd( zeroMask(c10), gf2_16_log_table[c10], log8 );
+  uint16_t  c9x8 = gf2_16_expadd( zeroMask( c9), gf2_16_log_table[ c9], log8 );
+  uint16_t  c8x8 = gf2_16_expadd( zeroMask( c8), gf2_16_log_table[ c8], log8 );
 
   d7 = c14   ^ c12   ^ c7;
   d6 = c14x8 ^ c13   ^ c11  ^ c6;

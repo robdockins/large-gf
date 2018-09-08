@@ -4,8 +4,8 @@
 #include "gf2_16.h"
 #include "gf2_128.h"
 
-//const unsigned long MAX_ROUNDS = 100000000;
-const unsigned long MAX_ROUNDS = 100;
+const unsigned long MAX_ROUNDS = 100000000;
+//const unsigned long MAX_ROUNDS = 100;
 
 int main(void) {
   unsigned int randreg;
@@ -15,9 +15,10 @@ int main(void) {
   //randreg = 0x1650338b;
   printf( "randreg = %#.8x\n", randreg );
 
+  uint128_t x, y, z;
+
   uint64_t i;
   for( i = 0; i < MAX_ROUNDS; i++ ) {
-    uint128_t x, y, z;
 
     x = (uint128_t) rand_r( &randreg );
     x <<= 32;
@@ -43,10 +44,24 @@ int main(void) {
     z <<= 32;
     z |= (uint128_t) rand_r( &randreg );
 
-    uint128_t w = gf2_128_mult( x, gf2_128_mult( y, z ) );
-    uint128_t v = gf2_128_mult( gf2_128_mult( x, y ), z );
+    uint128_t w;
+    uint128_t v;
+
+    // Commutivity test
+    w = gf2_128_mult( x, y );
+    v = gf2_128_mult( y, x );
+    if( w == v ) {
+    } else {
+      printf( "Commutivity fail:\n" );
+      printf( "  x = 0x%.16lx%.16lx\n", (uint64_t) (x>>64), (uint64_t) x );
+      printf( "  y = 0x%.16lx%.16lx\n", (uint64_t) (y>>64), (uint64_t) y );
+      printf( "  w = 0x%.16lx%.16lx\n", (uint64_t) (w>>64), (uint64_t) w );
+      printf( "  v = 0x%.16lx%.16lx\n", (uint64_t) (v>>64), (uint64_t) v );
+    }
 
     // Associativity test
+    w = gf2_128_mult( x, gf2_128_mult( y, z ) );
+    v = gf2_128_mult( gf2_128_mult( x, y ), z );
     if( w == v ) {
     } else {
       printf( "Associativity fail:\n" );
@@ -60,5 +75,6 @@ int main(void) {
   }
 
   printf( "%lld Tests completed\n", MAX_ROUNDS );
+
   return 0;
 }
