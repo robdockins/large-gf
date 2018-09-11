@@ -156,7 +156,7 @@ int main() {
     */
   }
 
-  printf( "%ulld Tests completed\n", MAX_ROUNDS );
+  printf( "%lu Tests completed\n", MAX_ROUNDS );
   return 0;
 }
 #endif

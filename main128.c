@@ -5,6 +5,7 @@
 #include "gf2_128.h"
 
 const unsigned long MAX_ROUNDS = 100000000;
+
 //const unsigned long MAX_ROUNDS = 100;
 
 int main(void) {

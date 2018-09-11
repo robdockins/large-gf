@@ -4,7 +4,7 @@
 #include "gf2_128.h"
 #include "gf_complete.h"
 
-const unsigned long MAX_ROUNDS = 10000000;
+const unsigned long MAX_ROUNDS = 100000000;
 
 int main() {
   unsigned int randreg;
@@ -45,9 +45,9 @@ int main() {
     /*     gf.multiply.w64( &gf, x, y ) ^ gf.multiply.w64( &gf, x, z ) ) { */
     /* } else { */
     /*   printf( "Distributivity fail:\n" ); */
-    /*   printf( "  x = 0x%.16lx\n", x ); */
-    /*   printf( "  y = 0x%.16lx\n", y ); */
-    /*   printf( "  z = 0x%.16lx\n", z ); */
+    /*   printf( "  x = 0x%.16llx\n", x ); */
+    /*   printf( "  y = 0x%.16llx\n", y ); */
+    /*   printf( "  z = 0x%.16llx\n", z ); */
     /* } */
 
     /* // Associativity test */
@@ -55,16 +55,16 @@ int main() {
     /*     gf.multiply.w64( &gf, gf.multiply.w64( &gf, x, y ), z ) ) { */
     /* } else { */
     /*   printf( "Associativity fail:\n" ); */
-    /*   printf( "  x = 0x%.16lx\n", x ); */
-    /*   printf( "  y = 0x%.16lx\n", y ); */
-    /*   printf( "  z = 0x%.16lx\n", z ); */
+    /*   printf( "  x = 0x%.16llx\n", x ); */
+    /*   printf( "  y = 0x%.16llx\n", y ); */
+    /*   printf( "  z = 0x%.16llx\n", z ); */
     /* } */
 
     /* // inverse test */
     /* if( x == 0 || gf.inverse.w64( &gf, x ) != 0) { */
     /* } else { */
     /*   printf( "Inversion fail:\n" ); */
-    /*   printf( "  x = 0x%.16lx\n", x ); */
+    /*   printf( "  x = 0x%.16llx\n", x ); */
     /* } */
 
     // inverse test
@@ -74,12 +74,12 @@ int main() {
       if( z[0] == 0 && z[1] == 1 ) {
       } else {
         printf( "Inversion fail:\n" );
-        printf( "  x = 0x%.16lx%.16lx\n", (uint64_t) (x[1]), (uint64_t) x[0] );
+        printf( "  x = 0x%.16llx%.16llx\n", (uint64_t) (x[1]), (uint64_t) x[0] );
       }
     }
 
   }
 
-  printf( "%d Tests completed\n", MAX_ROUNDS );
+  printf( "%lu Tests completed\n", MAX_ROUNDS );
  
 }

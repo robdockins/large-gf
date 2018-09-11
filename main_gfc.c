@@ -63,11 +63,11 @@ int main() {
     if( x == 0 || (gf.multiply.w64( &gf, x, gf.inverse.w64( &gf, x ) ) == 1) ) {
     } else {
       printf( "Inversion fail:\n" );
-      printf( "  x = 0x%.16lx\n", x );
+      printf( "  x = 0x%.16llx\n", x );
     }
 
   }
 
-  printf( "%d Tests completed\n", MAX_ROUNDS );
+  printf( "%lu Tests completed\n", MAX_ROUNDS );
  
 }
