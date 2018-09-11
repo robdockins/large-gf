@@ -90,12 +90,12 @@ int main() {
     /*
     // Distrbutivity test
     if( gf2_64_mult( x, y ^ z ) ==
-        gf2_64_mult( x, y ) ^ gf2_64_mult( x, z ) ) {
+        (gf2_64_mult( x, y ) ^ gf2_64_mult( x, z )) ) {
     } else {
       printf( "Distributivity fail:\n" );
-      printf( "  x = 0x%.16lx\n", x );
-      printf( "  y = 0x%.16lx\n", y );
-      printf( "  z = 0x%.16lx\n", z );
+      printf( "  x = 0x%.16llx\n", x );
+      printf( "  y = 0x%.16llx\n", y );
+      printf( "  z = 0x%.16llx\n", z );
     }
 
     // Associativity test
@@ -103,24 +103,24 @@ int main() {
         gf2_64_mult( gf2_64_mult( x, y ), z ) ) {
     } else {
       printf( "Associativity fail:\n" );
-      printf( "  x = 0x%.16lx\n", x );
-      printf( "  y = 0x%.16lx\n", y );
-      printf( "  z = 0x%.16lx\n", z );
+      printf( "  x = 0x%.16llx\n", x );
+      printf( "  y = 0x%.16llx\n", y );
+      printf( "  z = 0x%.16llx\n", z );
     }
 
     // Commutitivity test
     if( gf2_64_mult( x, y ) == gf2_64_mult( y, x ) ) {
     } else {
       printf( "Commutivity fail:\n" );
-      printf( "  x = 0x%.16lx\n", x );
-      printf( "  y = 0x%.16lx\n", y );
+      printf( "  x = 0x%.16llx\n", x );
+      printf( "  y = 0x%.16llx\n", y );
     }
 
     // squaring test
     if( gf2_64_mult( x, x ) == gf2_64_square( x ) ) {
     } else {
       printf( "Squaring fail:\n" );
-      printf( "  x = 0x%.16lx\n", x );
+      printf( "  x = 0x%.16llx\n", x );
     }
     */
 
@@ -128,7 +128,7 @@ int main() {
     if( x == 0 || (gf2_64_mult( x, gf2_64_inv( x ) ) == 1) ) {
     } else {
       printf( "Inversion fail:\n" );
-      printf( "  x = 0x%.16lx\n", x );
+      printf( "  x = 0x%.16llx\n", x );
     }
 
     /*
@@ -136,26 +136,27 @@ int main() {
     if( x == 0 || gf2_64_inv( x ) != 0) {
     } else {
       printf( "Inversion fail:\n" );
-      printf( "  x = 0x%.16lx\n", x );
+      printf( "  x = 0x%.16llx\n", x );
     }
+    */
 
-    /* /\* power test *\/ */
+    /* power test */
     /* if( gf2_64_pow_alternate( x, y ) == gf2_64_pow ( x, y ) ) { */
     /* } else { */
     /*   printf( "Power fail:\n" ); */
-    /*   printf( "  x = 0x%.16lx\n", x ); */
-    /*   printf( "  y = 0x%.16lx\n", y ); */
+    /*   printf( "  x = 0x%.16llx\n", x ); */
+    /*   printf( "  y = 0x%.16llx\n", y ); */
     /* } */
 
     /*
     if( gf2_64_generator( x ) ) {
       printf( "Group generator\n" );
-      printf( "   x = 0x%.16lx\n", x );
+      printf( "   x = 0x%.16llx\n", x );
     }
     */
   }
 
-  printf( "%lld Tests completed\n", MAX_ROUNDS );
+  printf( "%ulld Tests completed\n", MAX_ROUNDS );
   return 0;
 }
 #endif

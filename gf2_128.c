@@ -12,7 +12,7 @@
 //    x^8 + x^3 + x + 8
 //
 
-inline uint128_t gf2_128_mult( uint128_t a, uint128_t b ) {
+uint128_t gf2_128_mult( uint128_t a, uint128_t b ) {
   uint16_t a0, a1, a2, a3, a4, a5, a6, a7;
   uint16_t b0, b1, b2, b3, b4, b5, b6, b7;
   uint16_t za0, za1, za2, za3, za4, za5, za6, za7;
@@ -195,7 +195,7 @@ inline uint128_t gf2_128_mult( uint128_t a, uint128_t b ) {
 }
 
 
-inline uint16_t gf2_128_mult_low_coeff( uint128_t a, uint128_t b ) {
+uint16_t gf2_128_mult_low_coeff( uint128_t a, uint128_t b ) {
   uint16_t a0, a1, a2, a3, a4, a5, a6, a7;
   uint16_t b0, b1, b2, b3, b4, b5, b6, b7;
   uint16_t za0, za1, za2, za3, za4, za5, za6, za7;
@@ -290,7 +290,7 @@ inline uint16_t gf2_128_mult_low_coeff( uint128_t a, uint128_t b ) {
 }
 
 
-inline uint128_t gf2_128_pointwise_mult( uint16_t xlog, uint128_t a ) {
+uint128_t gf2_128_pointwise_mult( uint16_t xlog, uint128_t a ) {
   uint16_t a0, a1, a2, a3, a4, a5, a6, a7;
   uint16_t za0, za1, za2, za3, za4, za5, za6, za7;
 
@@ -348,7 +348,7 @@ inline uint128_t gf2_128_pointwise_mult( uint16_t xlog, uint128_t a ) {
   return d;
 }
 
-inline uint128_t gf2_128_square( uint128_t a ) {
+uint128_t gf2_128_square( uint128_t a ) {
   uint16_t a0, a1, a2, a3, a4, a5, a6, a7;
   uint16_t za0, za1, za2, za3, za4, za5, za6, za7;
 
@@ -436,7 +436,7 @@ inline uint128_t gf2_128_square( uint128_t a ) {
    ce94 5686 745d 11f9 376d 14ec af3a 0000
    f2c4 81c3 d3a4 d2ec 372a d568 7232 0001
  */
-inline uint128_t gf2_128_square16( uint128_t a ) {
+uint128_t gf2_128_square16( uint128_t a ) {
   uint16_t a0, a1, a2, a3, a4, a5, a6, a7;
   uint16_t za1, za2, za3, za4, za5, za6, za7;
 

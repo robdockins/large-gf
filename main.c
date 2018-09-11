@@ -24,7 +24,7 @@ int main() {
 
     // Distrbutivity test
     if( gf2_32_mult( x, y ^ z) ==
-        gf2_32_mult( x, y ) ^ gf2_32_mult( x, z ) ) {
+        (gf2_32_mult( x, y ) ^ gf2_32_mult( x, z )) ) {
     } else {
       printf( "Distributivity fail:\n" );
       printf( "  x = 0x%.8x\n", x );
